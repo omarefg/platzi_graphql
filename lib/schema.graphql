@@ -1,16 +1,39 @@
+enum Level {
+    basico
+    intermedio
+    avanzado
+}
+
+union GlobalSearch = Course | Student | Monitor
+
 type Course {
     _id: ID!
     title: String!
     teacher: String
     description: String!
-    topic: String
+    topic: String @deprecated
     people: [Student]
+    level: Level
 }
 
-type Student {
+interface Person {
     _id: ID!
     name: String!
     email: String!
+}
+
+type Student implements Person {
+    _id: ID!
+    name: String!
+    email: String!
+    avatar: String
+}
+
+type Monitor implements Person {
+    _id: ID!
+    name: String!
+    email: String!
+    phone: String
 }
 
 type Query {
@@ -19,9 +42,11 @@ type Query {
     "Devuelve un curso"
     getCourse(_id: ID!): Course
     "Devuelve todos los estudiantes"
-    getStudents: [Student]
+    getPeople: [Person]
     "Devuelve un estudiante"
-    getStudent(_id: ID!): Student
+    getPerson(_id: ID!): Person
+    "Ejecuta una búsqueda global"
+    searchItems(keyword: String!) : [GlobalSearch]
 }
 
 input CourseInput {
@@ -29,6 +54,7 @@ input CourseInput {
     teacher: String
     description: String!
     topic: String
+    level: Level
 }
 
 input CourseEditInput {
@@ -38,14 +64,18 @@ input CourseEditInput {
     topic: String
 }
 
-input StudentEditInput {
+input PersonEditInput {
     name: String
     email: String
+    phone: String
+    avatar: String
 }
 
-input StudentInput {
+input PersonInput {
     name: String!
     email: String!
+    phone: String
+    avatar: String
 }
 
 type Mutation {
@@ -55,12 +85,12 @@ type Mutation {
     editCourse(_id: ID!, input: CourseEditInput): Course
     "Elimina un curso"
     deleteCourse(_id: ID!): Boolean
-    "Crea un estudiante"
-    createStudent(input: StudentInput!): Student
-    "Edita un estudiante"
-    editStudent(_id: ID!, input: StudentEditInput): Student
-    "Elimina un estudiante"
-    deleteStudent(_id: ID!): Boolean
+    "Crea una persona"
+    createPerson(input: PersonInput!): Person
+    "Edita una persona"
+    editPerson(_id: ID!, input: PersonEditInput): Person
+    "Elimina una persona"
+    deletePerson(_id: ID!): Boolean
     "Agrega una persona a un curso"
     addPeople(courseID: ID!, personID: ID!): Course
 }
